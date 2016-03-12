@@ -23,6 +23,8 @@ namespace MovieStreaming.Actors
                     ConsoleColor.Red));
             Receive<StopMovieMessage>(
                 message => StopPlayingCurrentMovie());
+
+            ColorConsole.WriteLineInColor("UserActor has become playing", ConsoleColor.Cyan);
         }
 
         private void StopPlayingCurrentMovie()
