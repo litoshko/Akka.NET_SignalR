@@ -14,16 +14,24 @@ namespace MovieStreaming
             MovieStreamingActorSystem = ActorSystem.Create("MovieStreamingActorSystem");
             Console.WriteLine("Actor system created!");
 
-            Props playbackActorProps = Props.Create<PlaybackActor>();
+            Props userActorProps = Props.Create<UserActor>();
+            IActorRef userActorRef = MovieStreamingActorSystem.ActorOf(userActorProps, "UserActor");
 
-            IActorRef playbackActorRef = MovieStreamingActorSystem.ActorOf(playbackActorProps, "PlaybackActor");
+            Console.ReadKey(true);
+            Console.WriteLine("Sending a PlayMovieMessage (Akka.NET: The Movie)");
+            userActorRef.Tell(new PlayMovieMessage("Akka.NET: The Movie", 42));
+            Console.ReadKey(true);
+            Console.WriteLine("Sending a PlayMovieMessage (Partial Recall)");
+            userActorRef.Tell(new PlayMovieMessage("Partial Recall", 99));
+            Console.ReadKey(true);
+            Console.WriteLine("Sending a StopMovieMessage");
+            userActorRef.Tell(new StopMovieMessage());
+            Console.ReadKey(true);
+            Console.WriteLine("Sending another StopMovieMessage");
+            userActorRef.Tell(new StopMovieMessage());
 
-            playbackActorRef.Tell(new PlayMovieMessage("Akka.NET: The Movie", 42));
-            playbackActorRef.Tell(new PlayMovieMessage("Partial Recall", 99));
-            playbackActorRef.Tell(new PlayMovieMessage("Boolean lies", 77));
-            playbackActorRef.Tell(new PlayMovieMessage("Codenan the Destroyer", 1));
-
-            playbackActorRef.Tell(PoisonPill.Instance);
+            // Send message to make actor terminate when processing it
+            userActorRef.Tell(PoisonPill.Instance);
 
             // press any key to start shutdown of system
             Console.ReadKey(true);
