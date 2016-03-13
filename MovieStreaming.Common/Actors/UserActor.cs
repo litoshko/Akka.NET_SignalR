@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Akka.Actor;
-using MovieStreaming.Messages;
+using MovieStreaming.Common.Messages;
 
-namespace MovieStreaming.Actors
+namespace MovieStreaming.Common.Actors
 {
     public class UserActor : ReceiveActor
     {

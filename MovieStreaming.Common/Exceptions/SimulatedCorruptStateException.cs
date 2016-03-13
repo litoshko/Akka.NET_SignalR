@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace MovieStreaming.Exceptions
+namespace MovieStreaming.Common.Exceptions
 {
     [Serializable]
-    internal class SimulatedCorruptStateException : Exception
+    public class SimulatedCorruptStateException : Exception
     {
         public SimulatedCorruptStateException()
         {

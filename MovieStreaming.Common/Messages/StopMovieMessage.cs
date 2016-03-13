@@ -1,6 +1,6 @@
-﻿namespace MovieStreaming.Messages
+﻿namespace MovieStreaming.Common.Messages
 {
-    class StopMovieMessage
+    public class StopMovieMessage
     {
         private int userId;
 

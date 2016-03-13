@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace MovieStreaming.Exceptions
+namespace MovieStreaming.Common.Exceptions
 {
     [Serializable]
-    internal class SimulatedTerribleMovieException : Exception
+    public class SimulatedTerribleMovieException : Exception
     {
         public SimulatedTerribleMovieException()
         {
