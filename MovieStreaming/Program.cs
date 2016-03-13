@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Akka.Actor;
 using MovieStreaming.Actors;
 using MovieStreaming.Messages;
@@ -12,39 +13,51 @@ namespace MovieStreaming
         private static void Main(string[] args)
         {
             MovieStreamingActorSystem = ActorSystem.Create("MovieStreamingActorSystem");
-            Console.WriteLine("Actor system created!");
+            ColorConsole.WriteLineInColor("Actor system created", ConsoleColor.Gray);
 
-            Props userActorProps = Props.Create<UserActor>();
-            IActorRef userActorRef = MovieStreamingActorSystem.ActorOf(userActorProps, "UserActor");
+            ColorConsole.WriteLineInColor("Creating actor supervisory hierarchy", ConsoleColor.Gray);
+            MovieStreamingActorSystem.ActorOf(Props.Create<PlaybackActor>(), "Playback");
 
-            Console.ReadKey(true);
-            Console.WriteLine("Sending a PlayMovieMessage (Akka.NET: The Movie)");
-            userActorRef.Tell(new PlayMovieMessage("Akka.NET: The Movie", 42));
-            Console.ReadKey(true);
-            Console.WriteLine("Sending a PlayMovieMessage (Partial Recall)");
-            userActorRef.Tell(new PlayMovieMessage("Partial Recall", 99));
-            Console.ReadKey(true);
-            Console.WriteLine("Sending a StopMovieMessage");
-            userActorRef.Tell(new StopMovieMessage());
-            Console.ReadKey(true);
-            Console.WriteLine("Sending another StopMovieMessage");
-            userActorRef.Tell(new StopMovieMessage());
+            do
+            {
+                ShortPause();
 
-            // Send message to make actor terminate when processing it
-            userActorRef.Tell(PoisonPill.Instance);
+                Console.WriteLine();
+                ColorConsole.WriteLineInColor("enter a command and hit enter", ConsoleColor.Gray);
 
-            // press any key to start shutdown of system
-            Console.ReadKey(true);
+                var command = Console.ReadLine();
 
-            // tell actor system (and all its child actors) to shutdown
-            MovieStreamingActorSystem.Terminate();
+                if (command.StartsWith("play"))
+                {
+                    int userId = int.Parse(command.Split(',')[1]);
+                    string movieTitle = command.Split(',')[2];
 
-            // wait for actor to finish shutting down
-            MovieStreamingActorSystem.WhenTerminated.Wait();
-            Console.WriteLine("Actor System Terminated");
+                    var message = new PlayMovieMessage(movieTitle, userId);
+                    MovieStreamingActorSystem.ActorSelection("/user/Playback/UserCoordinator").Tell(message);
+                }
 
-            // Press any key to stop console application
-            Console.ReadKey(true);
+                if (command.StartsWith("stop"))
+                {
+                    int userId = int.Parse(command.Split(',')[1]);
+
+                    var message = new StopMovieMessage(userId);
+                    MovieStreamingActorSystem.ActorSelection("/user/Playback/UserCoordinator").Tell(message);
+                }
+
+                if (command == "exit")
+                {
+                    MovieStreamingActorSystem.ActorSelection("*").Tell(PoisonPill.Instance);
+                    MovieStreamingActorSystem.Terminate().Wait();
+                    ColorConsole.WriteLineInColor("Actor system shutdown", ConsoleColor.Gray);
+                    Console.ReadKey(true);
+                    Environment.Exit(1);
+                }
+            } while (true);
+        }
+
+        private static void ShortPause()
+        {
+            Thread.Sleep(100);
         }
     }
 }

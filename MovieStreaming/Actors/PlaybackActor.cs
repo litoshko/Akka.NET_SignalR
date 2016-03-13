@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Akka.Actor;
-using MovieStreaming.Messages;
 
 namespace MovieStreaming.Actors
 {
@@ -9,18 +7,11 @@ namespace MovieStreaming.Actors
     {
         public PlaybackActor()
         {
-            Console.WriteLine("Creating a PlaybackActor");
-
-            Receive<PlayMovieMessage>(message => HandlePlayMovieMessage(message));
+            Context.ActorOf(Props.Create<UserCoordinatorActor>(), "UserCoordinator");
+            Context.ActorOf(Props.Create<PlaybackStatisticsActor>(), "PlaybackStatistics");
         }
 
-        private void HandlePlayMovieMessage(PlayMovieMessage message)
-        {
-            ColorConsole.WriteLineInColor(
-                $"PlayMovieMessage: '{message.MovieTitle}' for user {message.UserId}", 
-                ConsoleColor.Yellow);
-        }
-
+        #region Lifecycle hooks
         protected override void PreStart()
         {
             ColorConsole.WriteLineInColor("PlaybackActor PreStart", ConsoleColor.Green);
@@ -44,5 +35,6 @@ namespace MovieStreaming.Actors
 
             base.PostRestart(reason);
         }
+        #endregion
     }
 }

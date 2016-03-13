@@ -9,7 +9,7 @@ namespace MovieStreaming.Actors
     {
         private string _currentlyWatching;
 
-        public UserActor()
+        public UserActor(int userId)
         {
             Console.WriteLine("Creating a UserActor");
 
@@ -51,6 +51,9 @@ namespace MovieStreaming.Actors
             _currentlyWatching = title;
 
             ColorConsole.WriteLineInColor($"Currently watching: '{title}'", ConsoleColor.Yellow);
+
+            Context.ActorSelection("/user/Playback/PlaybackStatistics/MoviePlayCounter")
+                .Tell(new IncrementPlayCountMessage(title));
 
             Become(Playing);
         }
